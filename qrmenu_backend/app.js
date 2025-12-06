@@ -21,8 +21,42 @@ const uploadRoutes = require('./routes/upload');
 
 // Middleware
 // CORS configuration - à restreindre en production
+const normalizeOrigin = (origin) => {
+  if (!origin) return origin;
+  // Enlever le slash final s'il existe et convertir en minuscules pour comparaison
+  return origin.replace(/\/$/, '').toLowerCase();
+};
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? false : true), // En production, utiliser CORS_ORIGIN
+  origin: (origin, callback) => {
+    // En développement, autoriser toutes les origines
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
+    // En production, vérifier l'origine
+    const allowedOrigin = normalizeOrigin(process.env.CORS_ORIGIN || process.env.FRONTEND_URL);
+    const requestOrigin = normalizeOrigin(origin);
+
+    // Si pas d'origine configurée, refuser
+    if (!allowedOrigin) {
+      return callback(new Error('CORS_ORIGIN not configured'));
+    }
+
+    // Comparer les origines normalisées
+    if (requestOrigin === allowedOrigin) {
+      callback(null, true);
+    } else {
+      // Logger pour debug
+      console.log('CORS blocked:', {
+        requestOrigin,
+        allowedOrigin,
+        rawRequestOrigin: origin,
+        rawAllowedOrigin: process.env.CORS_ORIGIN || process.env.FRONTEND_URL
+      });
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
