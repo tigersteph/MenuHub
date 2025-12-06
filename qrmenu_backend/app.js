@@ -36,12 +36,20 @@ const corsOptions = {
 
     // En production, vérifier l'origine
     const allowedOrigin = normalizeOrigin(process.env.CORS_ORIGIN || process.env.FRONTEND_URL);
-    const requestOrigin = normalizeOrigin(origin);
 
     // Si pas d'origine configurée, refuser
     if (!allowedOrigin) {
       return callback(new Error('CORS_ORIGIN not configured'));
     }
+
+    // Si pas d'origine dans la requête (same-origin ou requête directe), autoriser
+    // Cela peut arriver pour les requêtes preflight ou same-origin
+    if (!origin) {
+      // Autoriser les requêtes sans origin (same-origin)
+      return callback(null, true);
+    }
+
+    const requestOrigin = normalizeOrigin(origin);
 
     // Comparer les origines normalisées
     if (requestOrigin === allowedOrigin) {
