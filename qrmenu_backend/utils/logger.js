@@ -58,12 +58,10 @@ const logger = winston.createLogger({
   ]
 });
 
-// En développement, aussi logger dans la console
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: consoleFormat
-  }));
-}
+// Toujours logger dans la console pour voir les logs dans Render/Vercel
+logger.add(new winston.transports.Console({
+  format: consoleFormat
+}));
 
 // Méthodes helper pour un usage simplifié
 logger.request = (req, message = 'Request received') => {

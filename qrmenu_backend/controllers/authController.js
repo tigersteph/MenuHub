@@ -11,6 +11,12 @@ const authController = {
   register: async (req, res) => {
     try {
       logger.request(req, 'User registration attempt');
+      logger.info('Registration request body', { 
+        hasUsername: !!req.body.username,
+        hasEmail: !!req.body.email,
+        hasPassword: !!req.body.password,
+        bodyKeys: Object.keys(req.body)
+      });
       const { username, email, password, firstName, lastName, restaurantName, confirmPassword } = req.body;
 
       // Vérification du mot de passe
@@ -19,10 +25,21 @@ const authController = {
       }
 
       // Vérifier si l'utilisateur existe
-      const userExists = await db.query(
-        'SELECT * FROM users WHERE email = $1', 
-        [email]
-      );
+      logger.info('Checking if user exists', { email });
+      let userExists;
+      try {
+        userExists = await db.query(
+          'SELECT * FROM users WHERE email = $1', 
+          [email]
+        );
+      } catch (dbError) {
+        logger.error('Database error when checking user existence', { 
+          error: dbError.message, 
+          stack: dbError.stack,
+          code: dbError.code
+        });
+        throw dbError;
+      }
 
       if (userExists.rows.length > 0) {
         throw new ConflictError('Cet email est déjà utilisé');
@@ -38,12 +55,30 @@ const authController = {
       const hashedPassword = await bcrypt.hash(password, salt);
 
       // Créer l'utilisateur (adapté à la structure de la table)
-      const newUser = await db.query(
-        `INSERT INTO users (username, email, password_hash, first_name, last_name, restaurant_name)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING id, username, email, first_name, last_name, restaurant_name, created_at`,
-        [username, email, hashedPassword, firstName || '', lastName || '', restaurantName || '']
-      );
+      logger.info('Creating new user', { username, email });
+      let newUser;
+      try {
+        newUser = await db.query(
+          `INSERT INTO users (username, email, password_hash, first_name, last_name, restaurant_name)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING id, username, email, first_name, last_name, restaurant_name, created_at`,
+          [username, email, hashedPassword, firstName || '', lastName || '', restaurantName || '']
+        );
+      } catch (dbError) {
+        logger.error('Database error when creating user', { 
+          error: dbError.message, 
+          stack: dbError.stack,
+          code: dbError.code,
+          detail: dbError.detail
+        });
+        throw dbError;
+      }
+
+      // Vérifier que JWT_SECRET est défini
+      if (!process.env.JWT_SECRET) {
+        logger.error('JWT_SECRET is not defined in environment variables');
+        throw new Error('Configuration error: JWT_SECRET is missing');
+      }
 
       // Générer le token JWT (durée de session : 1h au lieu de 7d)
       const token = jwt.sign(
