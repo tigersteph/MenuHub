@@ -11,7 +11,10 @@ const pool = new Pool({
   min: parseInt(process.env.DB_POOL_MIN || '2', 10),
   idleTimeoutMillis: parseInt(process.env.DB_POOL_IDLE_TIMEOUT || '30000', 10),
   connectionTimeoutMillis: parseInt(process.env.DB_POOL_CONNECTION_TIMEOUT || '2000', 10),
-  allowExitOnIdle: false
+  allowExitOnIdle: false,
+  // Forcer IPv4 pour éviter les problèmes de connexion IPv6 sur Render
+  // family: 4 force l'utilisation d'IPv4 uniquement
+  ...(process.env.NODE_ENV === 'production' && { family: 4 })
 });
 
 pool.on('error', (err) => {
