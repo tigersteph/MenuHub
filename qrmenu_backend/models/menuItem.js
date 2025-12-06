@@ -56,7 +56,9 @@ class MenuItem {
       WHERE id = $7
       RETURNING *`;
     
-    const values = [categoryId, name, description, price, imageUrl, isAvailable, id];
+    // Convertir isAvailable (camelCase) en boolean si nécessaire
+    const isAvailableValue = isAvailable !== undefined ? Boolean(isAvailable) : undefined;
+    const values = [categoryId, name, description, price, imageUrl, isAvailableValue, id];
     const { rows } = await db.query(query, values);
     return rows[0];
   }

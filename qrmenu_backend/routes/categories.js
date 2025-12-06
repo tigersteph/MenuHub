@@ -7,6 +7,10 @@ router.use(authenticate);
 
 // Créer une catégorie
 router.post('/', categoryController.createCategory);
+// Mettre à jour une catégorie
+router.put('/:id', categoryController.updateCategory);
+// Supprimer une catégorie
+router.delete('/:id', categoryController.deleteCategory);
 // Lister les catégories d'un établissement
 router.get('/place/:placeId', categoryController.getCategoriesByPlace);
 

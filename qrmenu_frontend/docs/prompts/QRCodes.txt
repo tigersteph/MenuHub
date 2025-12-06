@@ -1,0 +1,35 @@
+Tokens CSS à utiliser pour la maquette :
+Palette :
+- Orange épicé : #FF6B35
+- Violet indigo : #6C63FF
+- Vert succès : #00B894
+- Jaune accent : #FFD600
+- Rouge alerte : #FF3B30
+- Surface claire : #F5F5F7
+- Surface carte/modale : #FFFFFF
+- Border gris : #E5E7EB
+- Texte foncé : #222
+- Texte clair : #F5F5F7
+- Texte muted : #6B7280
+Typographie : Inter, Segoe UI, Arial, sans-serif
+Font-size : 16px (base), 20px (lg), 22px (titre), 28px (xl)
+Radius : 18px (lg), 12px (md), 6px (sm)
+Ombres : 0 2px 16px rgba(0,0,0,0.07), 0 8px 32px #FF6B35
+Spacing : 32px (lg), 20px (md), 12px (sm)
+
+Titre : Génération QR codes — Interface
+
+Prompt (FR) :
+Conçois la page de génération et gestion des QR codes pour un établissement.
+
+Contenu :
+- Liste tables, chaque ligne avec preview QR, nom table, URL encodée, boutons "Télécharger PNG", "Imprimer".
+- Toolbar en haut : filtre, recherche, bouton orange "Générer tous".
+- Option d'export : PDF (impression en lot), réglages marges/taille
+- Aperçu étiquette : logo, nom table, QR, instructions courtes
+
+Design : interface utilitaire, disponible/print-ready, boutons action nets, export options visibles.
+
+Export : PNG desktop + sample PDF layout.
+
+Notes : s'appuyer sur `src/pages/QRCodesPage.js` et `src/pages/QRCodesList.js`.

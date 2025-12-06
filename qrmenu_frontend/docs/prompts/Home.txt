@@ -1,0 +1,47 @@
+Titre : Home — Page d’accueil (desktop + mobile)
+
+Tokens CSS à utiliser pour la maquette :
+Palette :
+- Orange épicé : #FF6B35
+- Violet indigo : #6C63FF
+- Vert succès : #00B894
+- Jaune accent : #FFD600
+- Rouge alerte : #FF3B30
+- Surface claire : #F5F5F7
+- Surface carte/modale : #FFFFFF
+- Border gris : #E5E7EB
+- Texte foncé : #222
+- Texte clair : #F5F5F7
+- Texte muted : #6B7280
+Typographie : Inter, Segoe UI, Arial, sans-serif
+Font-size : 16px (base), 20px (lg), 22px (titre), 28px (xl)
+Radius : 18px (lg), 12px (md), 6px (sm)
+Ombres : 0 2px 16px rgba(0,0,0,0.07), 0 8px 32px #FF6B35
+Spacing : 32px (lg), 20px (md), 12px (sm)
+
+Prompt (FR) :
+Crée une maquette moderne et professionnelle de la page d'accueil de l'application MenuHub (desktop et mobile).
+
+Contexte & objectifs : la page doit présenter le service, inviter à créer ou accéder à un établissement et orienter vers le menu client. Elle sert de point d'entrée pour restaurateurs et clients.
+
+Palette & style :
+- Palette : primaire #FF6B35 (Orange épicé), secondaire #6C63FF (Violet-indigo), surfaces claires #F5F5F7, texte foncé #1B1B1F, accent succès #00B894.
+- Police : Inter ou système sans-serif.
+- UI : coins arrondis (12–18px), ombres douces, espace généreux, esthétique premium.
+
+Contenu de la maquette :
+- Header : logo "MenuHub" à gauche, liens (Aide, Contact) et bouton Connexion/Inscription en haut à droite (bouton primaire orange).
+- Hero : grand titre "Modernisez votre restaurant", sous-titre court, image héro (photo restaurant), CTA principal orange « Commencer » et CTA secondaire violet « Découvrir ».
+- Section avantages : 3 cartes horizontales (icônes, titre, description courte).
+- Section CTA secondaire : témoignages / chiffres clés.
+- Footer minimal.
+
+Interactions / états :
+- Hover sur boutons (ombre + légère translation), état mobile (stack vertical), header sticky.
+- Fournir version desktop 1440×900 et mobile 390×844.
+
+Données d'exemple : "Le Gourmet", "Support 24/7", chiffres mock.
+
+Export : PNG 1440×900 (desktop) + 390×844 (mobile). Fournir list of colors, font sizes and spacing tokens.
+
+Notes : garder structure compatible avec `src/layouts/MainLayout.js` et le thème `premium-theme.css` existants.

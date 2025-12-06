@@ -1,0 +1,36 @@
+Titre : Suivi commande — Statut en temps réel
+
+Tokens CSS à utiliser pour la maquette :
+Palette :
+- Orange épicé : #FF6B35
+- Violet indigo : #6C63FF
+- Vert succès : #00B894
+- Jaune accent : #FFD600
+- Rouge alerte : #FF3B30
+- Surface claire : #F5F5F7
+- Surface carte/modale : #FFFFFF
+- Border gris : #E5E7EB
+- Texte foncé : #222
+- Texte clair : #F5F5F7
+- Texte muted : #6B7280
+Typographie : Inter, Segoe UI, Arial, sans-serif
+Font-size : 16px (base), 20px (lg), 22px (titre), 28px (xl)
+Radius : 18px (lg), 12px (md), 6px (sm)
+Ombres : 0 2px 16px rgba(0,0,0,0.07), 0 8px 32px #FF6B35
+Spacing : 32px (lg), 20px (md), 12px (sm)
+
+Prompt (FR) :
+Réalise une maquette de page de suivi de commande (post-validation) avec timeline visuelle indiquant les étapes : En attente → En préparation → Prêt → Servi.
+
+Éléments :
+- En-tête : numéro de commande, ETA estimée
+- Timeline (horizontale ou verticale) avec étapes colorées (orange pour actif, gris pour à venir, vert pour complété)
+- Détail commande : items, quantités, notes client
+- Bouton « Contacter le restaurant » (icône message)
+- Indicateur de paiement (si applicable)
+
+Design : micro-animations pour progression, badge d'état, lisibilité mobile-first.
+
+Export : PNG mobile + desktop. Données mock : commande #100, ETA 12–15 min.
+
+Notes : lié à `src/pages/Menu.js` / état commande côté `Orders`.

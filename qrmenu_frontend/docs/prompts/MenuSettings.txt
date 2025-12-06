@@ -1,0 +1,34 @@
+Titre : MenuSettings — Personnalisation du menu QR
+
+Tokens CSS à utiliser pour la maquette :
+Palette :
+- Orange épicé : #FF6B35
+- Violet indigo : #6C63FF
+- Vert succès : #00B894
+- Jaune accent : #FFD600
+- Rouge alerte : #FF3B30
+- Surface claire : #F5F5F7
+- Surface carte/modale : #FFFFFF
+- Border gris : #E5E7EB
+- Texte foncé : #222
+- Texte clair : #F5F5F7
+- Texte muted : #6B7280
+Typographie : Inter, Segoe UI, Arial, sans-serif
+Font-size : 16px (base), 20px (lg), 22px (titre), 28px (xl)
+Radius : 18px (lg), 12px (md), 6px (sm)
+Ombres : 0 2px 16px rgba(0,0,0,0.07), 0 8px 32px #FF6B35
+Spacing : 32px (lg), 20px (md), 12px (sm)
+
+Prompt (FR) :
+Conçois la page de paramètres d'apparence du menu QR : upload logo, sélection palette, aperçu live.
+
+Structure :
+- Formulaire : upload logo (drag/drop), color pickers pour primary / secondary, select police, toggles pour display options
+- Preview live : mini-iframe montrant rendu du menu avec les choix
+- CTA : bouton 'Enregistrer' orange, bouton 'Réinitialiser' secondaire
+
+Design convivial, helpers text pour formats d'image, validation côté client (taille file).
+
+Export : PNG desktop + mobile preview.
+
+Remarque : s'appuyer sur `src/pages/MenuSettings.js`.

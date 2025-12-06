@@ -1,0 +1,43 @@
+Titre : Fiche plat — Détail produit (modal + page)
+
+Tokens CSS à utiliser pour la maquette :
+Palette :
+- Orange épicé : #FF6B35
+- Violet indigo : #6C63FF
+- Vert succès : #00B894
+- Jaune accent : #FFD600
+- Rouge alerte : #FF3B30
+- Surface claire : #F5F5F7
+- Surface carte/modale : #FFFFFF
+- Border gris : #E5E7EB
+- Texte foncé : #222
+- Texte clair : #F5F5F7
+- Texte muted : #6B7280
+Typographie : Inter, Segoe UI, Arial, sans-serif
+Font-size : 16px (base), 20px (lg), 22px (titre), 28px (xl)
+Radius : 18px (lg), 12px (md), 6px (sm)
+Ombres : 0 2px 16px rgba(0,0,0,0.07), 0 8px 32px #FF6B35
+Spacing : 32px (lg), 20px (md), 12px (sm)
+
+Prompt (FR) :
+Génère une maquette de fiche produit (modal centré pour mobile et page pour desktop) pour un item du menu.
+
+Objectifs : afficher image, nom, description, options et controls quantité avec CTA clair "Ajouter au panier".
+
+Design : palette projet, image large en haut, carte blanche (#F5F5F7), coins arrondis, micro-interactions.
+
+Contenu :
+- Image principale (plein large en modal), badge option (ex : Végétarien)
+- Titre plat (22–26px)
+- Description détaillée (zone texte)
+- Prix en gras
+- Options (select pour taille, checkbox/radio pour accompagnement)
+- Contrôles de quantité (+ / − boutons circulaires)
+- CTA orange grand : "Ajouter au panier"
+- CTA secondaire discret : "Retour" ou icône fermer
+
+États : validation (spinner), erreur (stock insuffisant), confirmation (toast).
+
+Export : PNG mobile et desktop. Indiquer tokens couleurs et tailles de boutons.
+
+Notes : reprenez la logique de `src/components/MenuItem.js` pour la structure des données.
