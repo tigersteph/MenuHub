@@ -4,6 +4,24 @@
  */
 
 /**
+ * Convertit une URL HTTP en HTTPS si nécessaire
+ * @param {string} url - L'URL à convertir
+ * @returns {string} - L'URL en HTTPS
+ */
+function ensureHttps(url) {
+  if (!url || typeof url !== 'string') {
+    return url;
+  }
+  
+  // Si l'URL commence par http://, la remplacer par https://
+  if (url.startsWith('http://')) {
+    return url.replace('http://', 'https://');
+  }
+  
+  return url;
+}
+
+/**
  * Convertit un objet de snake_case vers camelCase
  * @param {Object} obj - Objet en snake_case
  * @returns {Object} - Objet en camelCase
@@ -41,7 +59,12 @@ function toCamelCase(obj) {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const camelKey = snakeToCamel(key);
-      const value = obj[key];
+      let value = obj[key];
+      
+      // Convertir les URLs d'images en HTTPS pour éviter les erreurs Mixed Content
+      if ((key === 'image_url' || key === 'logo_url' || key === 'url' || key === 'secure_url') && typeof value === 'string') {
+        value = ensureHttps(value);
+      }
       
       // Gérer les valeurs null/undefined
       if (value === null || value === undefined) {
