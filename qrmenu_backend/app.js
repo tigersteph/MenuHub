@@ -6,6 +6,7 @@ require('dotenv').config();
 
 // Import des routes
 const authRoutes = require('./routes/auth');
+const contactRoutes = require('./routes/contact');
 // Les autres routes seront importées ici
 // const menuRoutes = require('./routes/menu');
 // const orderRoutes = require('./routes/orders');
@@ -72,6 +73,19 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Compression HTTP pour réduire la taille des réponses
+const compression = require('compression');
+app.use(compression({
+  filter: (req, res) => {
+    // Compresser toutes les réponses sauf les images déjà compressées
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+  level: 6 // Niveau de compression équilibré
+}));
+
 // Trust proxy pour obtenir la vraie IP en production (nécessaire pour le rate limiting)
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
@@ -84,6 +98,8 @@ if (process.env.NODE_ENV === 'production') {
 // app.use(transformRequestBody);
 // Routes d'authentification (publiques) - DOIT être en premier
 app.use('/api/auth', authRoutes);
+// Route de contact (publique)
+app.use('/api/contact', contactRoutes);
 
 // Routes protégées - ordre important pour éviter les conflits
 app.use('/api/places', placeRoutes);

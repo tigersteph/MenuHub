@@ -184,6 +184,144 @@ class EmailService {
       return false;
     }
   }
+
+  /**
+   * Envoyer un email de contact depuis le formulaire
+   */
+  async sendContactEmail(contactData) {
+    const { name, email, subject, message } = contactData;
+    
+    if (!this.enabled || !this.transporter) {
+      logger.warn('Email service not available, contact form submission logged', { name, email, subject });
+      return false;
+    }
+
+    try {
+      // Email pour le développeur (notification)
+      const adminEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER || 'senseitenten24@gmail.com';
+      
+      const adminHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #FF5A1F; color: white; padding: 20px; text-align: center; }
+            .content { background: #f9f9f9; padding: 30px; }
+            .field { margin-bottom: 15px; }
+            .label { font-weight: bold; color: #FF5A1F; }
+            .value { margin-top: 5px; padding: 10px; background: white; border-left: 3px solid #FF5A1F; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>MenuHub - Nouveau message de contact</h1>
+            </div>
+            <div class="content">
+              <div class="field">
+                <div class="label">Nom complet :</div>
+                <div class="value">${name}</div>
+              </div>
+              <div class="field">
+                <div class="label">Email :</div>
+                <div class="value">${email}</div>
+              </div>
+              <div class="field">
+                <div class="label">Sujet :</div>
+                <div class="value">${subject}</div>
+              </div>
+              <div class="field">
+                <div class="label">Message :</div>
+                <div class="value">${message.replace(/\n/g, '<br>')}</div>
+              </div>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} MenuHub. Tous droits réservés.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const adminMailOptions = {
+        from: `"MenuHub Contact" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+        to: adminEmail,
+        replyTo: email,
+        subject: `[MenuHub Contact] ${subject}`,
+        html: adminHtml,
+        text: `Nouveau message de contact\n\nNom: ${name}\nEmail: ${email}\nSujet: ${subject}\n\nMessage:\n${message}`
+      };
+
+      // Email de confirmation pour l'utilisateur
+      const userHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #FF5A1F; color: white; padding: 20px; text-align: center; }
+            .content { background: #f9f9f9; padding: 30px; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>MenuHub</h1>
+            </div>
+            <div class="content">
+              <h2>Merci pour votre message !</h2>
+              <p>Bonjour ${name},</p>
+              <p>Nous avons bien reçu votre message concernant : <strong>${subject}</strong></p>
+              <p>Notre équipe vous répondra dans les plus brefs délais, généralement sous 24 heures.</p>
+              <p>En attendant, n'hésitez pas à nous contacter directement :</p>
+              <ul>
+                <li>Email : senseitenten24@gmail.com</li>
+                <li>Téléphone (WhatsApp) : +237 656 710 135</li>
+                <li>Téléphone : +237 676 773 396</li>
+              </ul>
+              <p>Cordialement,<br>L'équipe MenuHub</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} MenuHub. Tous droits réservés.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const userMailOptions = {
+        from: `"MenuHub" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+        to: email,
+        subject: 'Votre message a bien été reçu - MenuHub',
+        html: userHtml,
+        text: `Bonjour ${name},\n\nNous avons bien reçu votre message concernant : ${subject}\n\nNotre équipe vous répondra dans les plus brefs délais, généralement sous 24 heures.\n\nCordialement,\nL'équipe MenuHub`
+      };
+
+      // Envoyer les deux emails
+      const [adminInfo, userInfo] = await Promise.all([
+        this.transporter.sendMail(adminMailOptions),
+        this.transporter.sendMail(userMailOptions)
+      ]);
+
+      logger.info('Contact emails sent', { 
+        adminMessageId: adminInfo.messageId, 
+        userMessageId: userInfo.messageId,
+        from: email 
+      });
+      
+      return true;
+    } catch (error) {
+      logger.error('Failed to send contact email', { email, error: error.message });
+      return false;
+    }
+  }
 }
 
 // Singleton

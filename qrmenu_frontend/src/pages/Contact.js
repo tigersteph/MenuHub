@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import BackButton from '../components/ui/BackButton';
-import { Mail, Linkedin, Send, MessageSquare, User } from 'lucide-react';
+import { Mail, Linkedin, Send, MessageSquare, User, Phone, Loader2 } from 'lucide-react';
+import { request } from '../services/api';
+import { toast } from '../utils/toast';
 
 const Contact = () => {
   const history = useHistory();
@@ -12,6 +14,7 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -20,11 +23,35 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Ici vous pouvez ajouter la logique d'envoi du formulaire
-    const mailtoLink = `mailto:senseitenten24@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Nom: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`;
-    window.location.href = mailtoLink;
+    setIsSubmitting(true);
+
+    try {
+      const response = await request('/api/contact', {
+        method: 'POST',
+        data: formData,
+        showErrorToast: true
+      });
+
+      if (response && response.success) {
+        toast.success(response.message || 'Votre message a été envoyé avec succès !');
+        // Réinitialiser le formulaire
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        toast.error('Une erreur est survenue lors de l\'envoi du message. Veuillez réessayer.');
+      }
+    } catch (error) {
+      // L'erreur est déjà gérée par la fonction request avec toast.error
+      console.error('Error sending contact form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -87,6 +114,36 @@ const Contact = () => {
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm sm:text-base font-semibold text-dark-text mb-1 group-hover:text-primary transition-colors duration-200">Email</h3>
                       <p className="text-xs sm:text-sm text-gray-600 break-all">senseitenten24@gmail.com</p>
+                    </div>
+                  </a>
+
+                  <a 
+                    href="tel:+237656710135"
+                    className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 bg-white rounded-xl border border-gray-border hover:shadow-lg transition-all duration-200 hover:border-primary group min-h-[44px]"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-200">
+                        <Phone className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm sm:text-base font-semibold text-dark-text mb-1 group-hover:text-primary transition-colors duration-200">Téléphone (WhatsApp)</h3>
+                      <p className="text-xs sm:text-sm text-gray-600">+237 656 710 135</p>
+                    </div>
+                  </a>
+
+                  <a 
+                    href="tel:+237676773396"
+                    className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 bg-white rounded-xl border border-gray-border hover:shadow-lg transition-all duration-200 hover:border-primary group min-h-[44px]"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-200">
+                        <Phone className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm sm:text-base font-semibold text-dark-text mb-1 group-hover:text-primary transition-colors duration-200">Téléphone</h3>
+                      <p className="text-xs sm:text-sm text-gray-600">+237 676 773 396</p>
                     </div>
                   </a>
 
@@ -193,10 +250,20 @@ const Contact = () => {
 
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3.5 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-primary/90 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 min-h-[44px] active:scale-[0.98]"
+                    disabled={isSubmitting}
+                    className="w-full inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3.5 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-primary/90 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 min-h-[44px] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
-                    <Send className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                    Envoyer le message
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                        Envoi en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                        Envoyer le message
+                      </>
+                    )}
                   </button>
                 </form>
               </div>

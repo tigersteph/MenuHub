@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Facebook, Twitter, Instagram, Linkedin, Mail } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone } from 'lucide-react';
 
 /**
  * Footer amélioré avec colonnes organisées, newsletter et réseaux sociaux
@@ -194,11 +194,23 @@ const EnhancedFooter = () => {
                 </a>
               </div>
             </div>
-            <div className="flex items-center gap-4 text-sm text-zinc-600">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 text-sm text-zinc-600">
               <div className="flex items-center gap-2">
                 <Mail size={16} />
                 <a href="mailto:senseitenten24@gmail.com" className="hover:text-[#FF5A1F] transition-colors">
                   senseitenten24@gmail.com
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone size={16} />
+                <a href="tel:+237656710135" className="hover:text-[#FF5A1F] transition-colors">
+                  +237 656 710 135
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone size={16} />
+                <a href="tel:+237676773396" className="hover:text-[#FF5A1F] transition-colors">
+                  +237 676 773 396
                 </a>
               </div>
             </div>
