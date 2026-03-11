@@ -444,17 +444,15 @@ const Place = () => {
         // Créer une nouvelle catégorie
         await addCategoryData(data);
         toast.success('Catégorie créée avec succès');
-        // Recharger les données pour afficher la nouvelle catégorie
-        await loadPlace();
-        await loadPlaceStats(true); // Forcer le rafraîchissement
+        // Pas besoin de recharger, la mise à jour optimiste dans usePlaceData est suffisante
+        await loadPlaceStats(true); // Forcer le rafraîchissement des stats
         notifyPlacesPage('menu-changed'); // Notifier Places.js
       } else {
         // Mettre à jour une catégorie existante
         await updateCategoryData(categoryId, data);
         toast.success('Catégorie mise à jour avec succès');
-        // Recharger les données pour mettre à jour l'affichage
-        await loadPlace();
-        await loadPlaceStats(true); // Forcer le rafraîchissement
+        // Pas besoin de recharger, la mise à jour optimiste dans usePlaceData est suffisante
+        await loadPlaceStats(true); // Forcer le rafraîchissement des stats
         notifyPlacesPage('menu-changed'); // Notifier Places.js
       }
     } catch (err) {
@@ -523,8 +521,8 @@ const Place = () => {
     }
   };
 
-  // Placeholders pour le menu si non présent
-  const categories = place?.categories || [];
+  // Placeholders pour le menu si non présent - mémorisé pour éviter les re-renders inutiles
+  const categories = React.useMemo(() => place?.categories || [], [place?.categories]);
   
   // Log pour déboguer les catégories (en développement uniquement)
   React.useEffect(() => {

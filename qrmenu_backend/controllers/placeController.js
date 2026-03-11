@@ -72,14 +72,30 @@ const placeController = {
       );
       const categories = categoriesResult.rows;
       
-      // Pour chaque catégorie, récupérer les plats disponibles uniquement
-      for (const cat of categories) {
-        const itemsResult = await db.query(
-          'SELECT * FROM menu_items WHERE category_id = $1 AND is_available = true ORDER BY name',
-          [cat.id]
-        );
-        cat.menu_items = itemsResult.rows;
-      }
+      // Optimisation: récupérer tous les items en une seule requête au lieu de N+1
+      const itemsResult = await db.query(`
+        SELECT mi.*, c.id as category_id
+        FROM menu_items mi
+        JOIN categories c ON mi.category_id = c.id
+        WHERE c.place_id = $1 AND mi.is_available = true
+        ORDER BY c.name, mi.name
+      `, [place.id]);
+      
+      // Grouper les items par catégorie
+      const itemsByCategory = {};
+      itemsResult.rows.forEach(item => {
+        if (!itemsByCategory[item.category_id]) {
+          itemsByCategory[item.category_id] = [];
+        }
+        // Retirer category_id du résultat pour conserver la structure originale
+        const { category_id, ...itemData } = item;
+        itemsByCategory[item.category_id].push(itemData);
+      });
+      
+      // Assigner les items à chaque catégorie
+      categories.forEach(cat => {
+        cat.menu_items = itemsByCategory[cat.id] || [];
+      });
       
       place.categories = categories;
       
@@ -117,14 +133,30 @@ const placeController = {
       );
       const categories = categoriesResult.rows;
       
-      // Pour chaque catégorie, récupérer les plats
-      for (const cat of categories) {
-        const itemsResult = await db.query(
-          'SELECT * FROM menu_items WHERE category_id = $1 ORDER BY name',
-          [cat.id]
-        );
-        cat.menu_items = itemsResult.rows;
-      }
+      // Optimisation: récupérer tous les items en une seule requête au lieu de N+1
+      const itemsResult = await db.query(`
+        SELECT mi.*, c.id as category_id
+        FROM menu_items mi
+        JOIN categories c ON mi.category_id = c.id
+        WHERE c.place_id = $1
+        ORDER BY c.name, mi.name
+      `, [place.id]);
+      
+      // Grouper les items par catégorie
+      const itemsByCategory = {};
+      itemsResult.rows.forEach(item => {
+        if (!itemsByCategory[item.category_id]) {
+          itemsByCategory[item.category_id] = [];
+        }
+        // Retirer category_id du résultat pour conserver la structure originale
+        const { category_id, ...itemData } = item;
+        itemsByCategory[item.category_id].push(itemData);
+      });
+      
+      // Assigner les items à chaque catégorie
+      categories.forEach(cat => {
+        cat.menu_items = itemsByCategory[cat.id] || [];
+      });
       
       place.categories = categories;
       return success(res, place);

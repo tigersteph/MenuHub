@@ -87,6 +87,8 @@ const TestimonialsSection = () => {
                     src={currentTestimonial.image}
                     alt={currentTestimonial.name}
                     className="h-16 w-16 rounded-full object-cover border-2 border-[#FF5A1F]"
+                    loading="lazy"
+                    decoding="async"
                   />
                 )}
                 <div className="text-left">

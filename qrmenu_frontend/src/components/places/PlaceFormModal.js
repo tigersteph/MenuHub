@@ -13,10 +13,14 @@ const PlaceFormModal = ({ isOpen, onClose, onDone, title }) => {
 
   if (!isOpen) return null;
 
-  const handleDone = (data) => {
-    if (onDone) onDone(data);
-    // Ne pas fermer automatiquement pour laisser l'utilisateur voir le message de succès
-    // onClose();
+  const handleDone = async (data) => {
+    if (onDone) {
+      await onDone(data);
+    }
+    // Fermer le modal après un court délai pour laisser voir le message de succès
+    setTimeout(() => {
+      onClose();
+    }, 500);
   };
 
   return (

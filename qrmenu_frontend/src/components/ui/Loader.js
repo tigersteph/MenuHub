@@ -3,8 +3,8 @@ import { Spinner } from 'react-bootstrap';
 
 const Loader = ({ text }) => (
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
-    <Spinner animation="border" role="status" style={{color:'#ff3366', width:48, height:48, borderWidth:4}} />
-    <div style={{ marginTop: 16, color:'#ff3366', fontWeight:'bold', fontSize:18, animation:'fadein 1.2s' }}>
+    <Spinner animation="border" role="status" style={{color:'#f7651d', width:48, height:48, borderWidth:4}} />
+    <div style={{ marginTop: 16, color:'#f7651d', fontWeight:'bold', fontSize:18, animation:'fadein 1.2s' }}>
       {text || "Chargement en cours..."}
     </div>
     <style>{`

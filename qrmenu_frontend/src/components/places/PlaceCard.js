@@ -54,10 +54,12 @@ const PlaceCard = React.memo(({
         )}
       </div>
 
-      <div
-        className="aspect-video w-full rounded-md bg-cover bg-center bg-gray-200"
-        style={{ backgroundImage: `url('${place.logoUrl || place.logo_url || "/img/hero-restaurant.jpg"}')` }}
+      <img
+        src={place.logoUrl || place.logo_url || "/img/hero-restaurant.jpg"}
+        alt={place.name || 'Établissement'}
+        className="aspect-video w-full rounded-md object-cover bg-gray-200"
         loading="lazy"
+        decoding="async"
       />
       <div className="flex flex-col">
         <p className="text-xl font-semibold text-dark-text">{place.name}</p>

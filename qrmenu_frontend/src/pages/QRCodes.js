@@ -20,7 +20,7 @@ const QRCodes = () => {
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <html><head><title>QR Code Table</title></head><body style='display:flex;flex-direction:column;align-items:center;background:#f8f9fa;'>
-      <h2 style='color:#ff3366;font-family:sans-serif;'>QR Code MenuHub</h2>
+      <h2 style='color:#f7651d;font-family:sans-serif;'>QR Code MenuHub</h2>
       <div style='margin:2rem;'>
         <div id='qrcode'></div>
         <div style='margin-top:1rem;font-size:1.2rem;font-weight:bold;'>${restaurantName ? restaurantName : ''}${tableNumber ? ' - Table ' + tableNumber : ''}</div>

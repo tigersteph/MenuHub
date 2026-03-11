@@ -28,6 +28,20 @@ const orderController = {
         throw new ValidationError('Données de commande invalides');
       }
 
+      // Optimisation: récupérer tous les items en une seule requête au lieu de N requêtes
+      const itemIds = items.map(i => i.menuItemId).filter(Boolean);
+      if (itemIds.length === 0) {
+        throw new ValidationError('Aucun menuItemId valide fourni');
+      }
+
+      const db = require('../config/db');
+      const menuItemsResult = await db.query(`
+        SELECT * FROM menu_items 
+        WHERE id = ANY($1::uuid[]) AND place_id = $2
+      `, [itemIds, placeId]);
+
+      const menuItemsMap = new Map(menuItemsResult.rows.map(mi => [mi.id, mi]));
+
       // Valider les items et vérifier les prix (sécurité)
       const validatedItems = [];
       for (const item of items) {
@@ -37,7 +51,7 @@ const orderController = {
           }
 
           // Vérifier que l'item existe et appartient à cet établissement
-          const menuItem = await MenuItem.findById(item.menuItemId);
+          const menuItem = menuItemsMap.get(item.menuItemId);
           if (!menuItem) {
             throw new NotFoundError(`Élément de menu avec l'ID ${item.menuItemId}`);
           }
@@ -131,6 +145,20 @@ const orderController = {
         throw new ValidationError('Données de commande invalides');
       }
 
+      // Optimisation: récupérer tous les items en une seule requête au lieu de N requêtes
+      const itemIds = items.map(i => i.menuItemId).filter(Boolean);
+      if (itemIds.length === 0) {
+        throw new ValidationError('Aucun menuItemId valide fourni');
+      }
+
+      const db = require('../config/db');
+      const menuItemsResult = await db.query(`
+        SELECT * FROM menu_items 
+        WHERE id = ANY($1::uuid[]) AND place_id = $2
+      `, [itemIds, placeId]);
+
+      const menuItemsMap = new Map(menuItemsResult.rows.map(mi => [mi.id, mi]));
+
       // Valider les items et vérifier les prix (sécurité)
       const validatedItems = [];
       for (const item of items) {
@@ -139,7 +167,7 @@ const orderController = {
         }
 
         // Vérifier que l'item existe et appartient à cet établissement
-        const menuItem = await MenuItem.findById(item.menuItemId);
+        const menuItem = menuItemsMap.get(item.menuItemId);
         if (!menuItem) {
           throw new NotFoundError(`Élément de menu avec l'ID ${item.menuItemId}`);
         }
@@ -258,7 +286,7 @@ const orderController = {
     try {
       logger.request(req, 'Get orders by place');
       const { placeId } = req.params;
-      const { status } = req.query;
+      const { status, page = 1, limit = 50 } = req.query;
 
       // Vérifier que l'utilisateur est propriétaire
       const isOwner = await Place.isOwner(placeId, req.user.id);
@@ -266,8 +294,22 @@ const orderController = {
         throw new UnauthorizedError('Vous n\'êtes pas autorisé à voir les commandes de cet établissement');
       }
 
-      const orders = await Order.findByPlaceId(placeId, status);
-      return success(res, orders);
+      const offset = (parseInt(page) - 1) * parseInt(limit);
+      
+      const [orders, total] = await Promise.all([
+        Order.findByPlaceId(placeId, status, { limit: parseInt(limit), offset }),
+        Order.countByPlaceId(placeId, status)
+      ]);
+      
+      return success(res, {
+        orders,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / parseInt(limit))
+        }
+      });
     } catch (err) {
       logger.errorRequest(req, err, 'Get orders by place failed');
       return handleControllerError(res, err, 'Erreur lors de la récupération des commandes');

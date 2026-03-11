@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-// import CustomToast from './CustomToast'; // Réservé pour usage futur
+import { ToastContainer, toast as reactToastify, Slide } from 'react-toastify';
 
 const ToastWrapper = () => {
   const location = useLocation();
+  const previousPathnameRef = useRef(location.pathname);
   
   // Safety check: fallback to window.location if useLocation fails
   const pathname = location?.pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
@@ -12,6 +12,17 @@ const ToastWrapper = () => {
   
   // Position: top-center for client (visible but discrete), top-right for restaurant
   const position = isClientPage ? 'top-center' : 'top-right';
+  
+  // Nettoyer les toasts lors des changements de route
+  useEffect(() => {
+    // Si le pathname a changé, nettoyer tous les toasts
+    if (previousPathnameRef.current !== pathname) {
+      // Nettoyer immédiatement les toasts lors du changement de route
+      // Cela évite que les notifications de la page précédente restent visibles
+      reactToastify.dismiss();
+      previousPathnameRef.current = pathname;
+    }
+  }, [pathname]);
   
   // Note: autoClose is now handled per notification type in utils/toast.js
   // Using a default fallback value (will be overridden by individual toast calls)
@@ -31,14 +42,14 @@ const ToastWrapper = () => {
       newestOnTop={true}
       closeOnClick={true}
       rtl={false}
-      pauseOnFocusLoss={true}
+      pauseOnFocusLoss={false}
       draggable={false}
-      pauseOnHover={true}
+      pauseOnHover={false}
       theme="light"
       toastClassName="custom-toast-wrapper"
       bodyClassName="custom-toast-body-wrapper"
-      closeButton={true}
-      transition={undefined}
+      closeButton={false}
+      transition={Slide}
       enableMultiContainer={false}
       limit={5}
     />

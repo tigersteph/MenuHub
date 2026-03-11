@@ -335,6 +335,7 @@ const Menu = () => {
                   alt={place.name || 'Logo'} 
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover shadow-sm flex-shrink-0" 
                   loading="eager"
+                  decoding="async"
                 />
               ) : (
                 <div 

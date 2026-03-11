@@ -291,6 +291,9 @@ textarea {
   justify-content: center;
   transition: color 0.2s ease;
   flex-shrink: 0;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
 }
 
 .custom-toast-close-button:hover {
@@ -301,6 +304,47 @@ textarea {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+.custom-toast-close-button:active {
+  transform: scale(0.95);
+}
+
+/* Indicateur de temps restant */
+.custom-toast-timer {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-right: 4px;
+  min-width: 24px;
+  text-align: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  align-self: center;
+  font-variant-numeric: tabular-nums; /* Alignement numérique uniforme */
+}
+
+.custom-toast-timer:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Animation de fermeture pour les toasts */
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.Toastify__toast--exit {
+  animation: toastSlideOut 0.3s ease-out forwards;
 }
 
 /* Override react-toastify default styles to use our custom design */
@@ -325,8 +369,30 @@ textarea {
   display: block !important;
 }
 
+/* Barre de progression personnalisée pour les notifications */
 .Toastify__progress-bar {
-  display: none !important;
+  display: block !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, rgba(247, 101, 29, 0.8), rgba(255, 138, 77, 0.6)) !important;
+  opacity: 0.9 !important;
+  transition: width 0.1s linear !important;
+}
+
+/* Couleurs spécifiques par type de notification */
+.Toastify__toast--success .Toastify__progress-bar {
+  background: linear-gradient(90deg, rgba(38, 155, 36, 0.8), rgba(4, 228, 0, 0.6)) !important;
+}
+
+.Toastify__toast--error .Toastify__progress-bar {
+  background: linear-gradient(90deg, rgba(220, 38, 38, 0.8), rgba(254, 226, 226, 0.6)) !important;
+}
+
+.Toastify__toast--warning .Toastify__progress-bar {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.8), rgba(254, 243, 199, 0.6)) !important;
+}
+
+.Toastify__toast--info .Toastify__progress-bar {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.8), rgba(219, 234, 254, 0.6)) !important;
 }
 
 .Toastify__close-button {

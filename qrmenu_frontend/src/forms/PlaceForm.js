@@ -49,7 +49,7 @@ const PlaceForm = ({ onDone }) => {
 
     setIsSubmitting(true);
     try {
-      const json = await addPlace({ 
+      const response = await addPlace({ 
         name: name.trim(), 
         description: description.trim(), 
         address: address.trim(), 
@@ -57,15 +57,26 @@ const PlaceForm = ({ onDone }) => {
         logo_url: logo 
       }, auth.token);
       
-      if (json && json.id) {
-        setCreatedPlace(json);
+      // Le backend retourne { success: true, data: place } ou directement place
+      const createdPlace = response?.data || response;
+      
+      if (createdPlace && createdPlace.id) {
+        setCreatedPlace(createdPlace);
         toast.success(t('places.form.createSuccess'));
         setName("");
         setDescription("");
         setAddress("");
         setPhone("");
         setLogo("");
-        if (onDone) onDone(json);
+        // Appeler onDone de manière asynchrone pour permettre le rafraîchissement
+        if (onDone) {
+          // Attendre un court délai pour s'assurer que le backend a bien enregistré
+          setTimeout(() => {
+            onDone(createdPlace);
+          }, 100);
+        }
+      } else {
+        throw new Error('Réponse invalide du serveur');
       }
     } catch (err) {
       console.error('Erreur création établissement:', err);
@@ -112,12 +123,24 @@ const PlaceForm = ({ onDone }) => {
         </div>
         <h3 className="text-xl sm:text-2xl font-bold text-dark-text mb-2">{t('places.form.successTitle')}</h3>
         <p className="text-sm sm:text-base text-muted-text mb-4 sm:mb-6 max-w-md">{t('places.form.successDescription')}</p>
-        <button
-          onClick={() => window.location.href = `/places/${createdPlace.id}/edit`}
-          className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary shadow-lg min-h-[44px] text-sm sm:text-base active:scale-[0.98]"
-        >
-          {t('places.form.configureMenu')}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <button
+            onClick={() => {
+              // Réinitialiser l'état pour permettre de créer un autre établissement
+              setCreatedPlace(null);
+              if (onDone) onDone(createdPlace);
+            }}
+            className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-lg min-h-[44px] text-sm sm:text-base active:scale-[0.98]"
+          >
+            {t('common.close')}
+          </button>
+          <button
+            onClick={() => window.location.href = `/places/${createdPlace.id}/edit`}
+            className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary shadow-lg min-h-[44px] text-sm sm:text-base active:scale-[0.98]"
+          >
+            {t('places.form.configureMenu')}
+          </button>
+        </div>
       </div>
     );
   }

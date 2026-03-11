@@ -177,8 +177,10 @@ class Order {
   }
 
   // Trouver les commandes d'un établissement
-  static async findByPlaceId(placeId, status = null) {
+  static async findByPlaceId(placeId, status = null, options = {}) {
     try {
+      const { limit = 1000, offset = 0 } = options;
+      
       // Vérifier si customer_notes existe
       const hasCustomerNotes = await this.hasColumn('orders', 'customer_notes');
       
@@ -215,7 +217,8 @@ class Order {
         queryParams.push(status);
       }
       
-      query += ` GROUP BY o.id, o.place_id, o.table_id, o.status, o.total_amount, o.created_at${hasCustomerNotes ? ', o.customer_notes' : ''}, t.name ORDER BY o.created_at DESC LIMIT 1000`;
+      query += ` GROUP BY o.id, o.place_id, o.table_id, o.status, o.total_amount, o.created_at${hasCustomerNotes ? ', o.customer_notes' : ''}, t.name ORDER BY o.created_at DESC LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+      queryParams.push(limit, offset);
       
       const { rows } = await db.query(query, queryParams);
       
@@ -298,6 +301,18 @@ class Order {
       [orderId]
     );
     return rowCount > 0;
+  }
+
+  // Compter les commandes d'un établissement
+  static async countByPlaceId(placeId, status = null) {
+    let query = 'SELECT COUNT(*) as count FROM orders WHERE place_id = $1';
+    const params = [placeId];
+    if (status) {
+      query += ' AND status = $2';
+      params.push(status);
+    }
+    const { rows } = await db.query(query, params);
+    return parseInt(rows[0].count, 10);
   }
 }
 

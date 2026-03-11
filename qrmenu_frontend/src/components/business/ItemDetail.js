@@ -53,6 +53,7 @@ const ItemDetail = ({ item, onClose, onAddToCart, color }) => {
                     imageLoaded ? 'opacity-100' : 'opacity-0'
                   }`}
                   loading="eager"
+                  decoding="async"
                   onLoad={() => setImageLoaded(true)}
                   onError={() => {
                     setImageError(true);

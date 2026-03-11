@@ -14,7 +14,8 @@
     "apply-indexes": "node scripts/apply_indexes.js",
     "diagnose:tables": "node scripts/diagnose_table_deletion.js",
     "fix:table-constraint": "node scripts/fix_table_constraint.js",
-    "check:orders-schema": "node scripts/check_orders_schema.js"
+    "check:orders-schema": "node scripts/check_orders_schema.js",
+    "generate:jwt-secret": "node scripts/generate-jwt-secret.js"
   },
   "keywords": [],
   "author": "",

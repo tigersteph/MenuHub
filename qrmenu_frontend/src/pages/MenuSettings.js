@@ -71,7 +71,7 @@ const MenuSettings = () => {
           <Panel>
             <div className="mb-4 d-flex align-items-center" style={{gap:'12px'}}>
               <BackButton onClick={onBack} ariaLabel="Retour" />
-              <h4 className="mb-0" style={{color:'#ff3366'}}>Assistant de configuration du menu</h4>
+              <h4 className="mb-0" style={{color:'#f7651d'}}>Assistant de configuration du menu</h4>
             </div>
             <p className="text-muted">Personnalisez l’apparence de votre menu QR : ajoutez un logo, choisissez les couleurs et le style d’affichage. Vous pourrez modifier ces paramètres à tout moment.</p>
             <ol className="text-left mx-auto" style={{maxWidth:400}}>
@@ -88,8 +88,8 @@ const MenuSettings = () => {
               </div>
               <div className="form-group mt-3">
                 <label>Couleur principale</label>
-                <input type="color" value={color || '#ff3366'} onChange={e => setColor(e.target.value)} style={{width:50, height:30, border:'none'}} />
-                <span className="ml-2">{color || '#ff3366'}</span>
+                <input type="color" value={color || '#f7651d'} onChange={e => setColor(e.target.value)} style={{width:50, height:30, border:'none'}} />
+                <span className="ml-2">{color || '#f7651d'}</span>
               </div>
               <div className="form-group mt-3">
                 <label>Police d’écriture</label>
@@ -103,7 +103,7 @@ const MenuSettings = () => {
               </div>
               <div className="mt-4 d-flex justify-content-between">
                 <BackButton onClick={onBack} ariaLabel="Retour" />
-                <button type="button" className="btn btn-primary" style={{background:'#ff3366', border:'none'}} onClick={onUpdatePlace} disabled={loading}>
+                <button type="button" className="btn btn-primary" style={{background:'#f7651d', border:'none'}} onClick={onUpdatePlace} disabled={loading}>
                   {loading ? 'Sauvegarde...' : 'Sauvegarder'}
                 </button>
               </div>

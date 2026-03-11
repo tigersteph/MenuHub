@@ -80,7 +80,7 @@ const TablesManager = ({ placeId, token }) => {
 
   return (
     <div>
-      <h4 style={{color:'#ff3366'}}>{t('tables')} {t('settings')}</h4>
+      <h4 style={{color:'#f7651d'}}>{t('tables')} {t('settings')}</h4>
       <div className="mb-3 p-3 bg-white rounded shadow-sm">
         <p className="text-muted mb-2">Les tables permettent d’identifier les zones de commande dans votre restaurant (ex : Table 1, Terrasse, Salon privé).<br/>Vous pouvez ajouter, modifier ou supprimer des tables à tout moment.</p>
       </div>
@@ -95,14 +95,14 @@ const TablesManager = ({ placeId, token }) => {
           />
         </Col>
         <Col xs={4}>
-          <Button style={{background:'#ff3366', border:'none'}} onClick={handleAddTable} disabled={loading}>{t('add')}</Button>
+          <Button style={{background:'#f7651d', border:'none'}} onClick={handleAddTable} disabled={loading}>{t('add')}</Button>
         </Col>
       </Row>
       {loading ? (
         <Loader text={t('tables.loading')} />
       ) : tables.length === 0 ? (
         <div className="text-center p-4 bg-white rounded shadow-sm mb-4">
-          <h5 className="mb-3" style={{color:'#ff3366'}}>Aucune table enregistrée</h5>
+          <h5 className="mb-3" style={{color:'#f7651d'}}>Aucune table enregistrée</h5>
           <p>Ajoutez vos premières tables pour permettre la prise de commande par QR code.</p>
         </div>
       ) : (
@@ -147,12 +147,12 @@ const TablesManager = ({ placeId, token }) => {
                 <td>
                   {editingTable === table.id ? (
                     <>
-                      <Button size="sm" style={{background:'#ff3366', border:'none'}} onClick={handleUpdateTable} disabled={loading}>{t('save')}</Button>{' '}
+                      <Button size="sm" style={{background:'#f7651d', border:'none'}} onClick={handleUpdateTable} disabled={loading}>{t('save')}</Button>{' '}
                       <Button size="sm" variant="secondary" onClick={() => setEditingTable(null)} disabled={loading}>{t('cancel')}</Button>
                     </>
                   ) : (
                     <>
-                      <Button size="sm" style={{background:'#ff3366', border:'none'}} onClick={() => handleEditTable(table)} disabled={loading}>{t('edit')}</Button>{' '}
+                      <Button size="sm" style={{background:'#f7651d', border:'none'}} onClick={() => handleEditTable(table)} disabled={loading}>{t('edit')}</Button>{' '}
                       <Button size="sm" variant="danger" onClick={() => handleRemoveTable(table.id)} disabled={loading}>{t('delete')}</Button>
                     </>
                   )}

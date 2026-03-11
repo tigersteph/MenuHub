@@ -55,6 +55,7 @@ const MenuItem = memo(({ item, onEdit, onRemove, onOrder, onItemClick, color }) 
                   imageLoaded ? 'opacity-100' : 'opacity-0'
                 }`}
                 loading="lazy"
+                decoding="async"
                 onLoad={() => setImageLoaded(true)}
                 onError={() => {
                   setImageError(true);

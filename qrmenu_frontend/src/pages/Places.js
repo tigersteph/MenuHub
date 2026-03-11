@@ -164,11 +164,22 @@ const Places = () => {
     }
   }, [auth.token, location.pathname, selectedPlaceId, t]);
 
-  const onDone = useCallback(async () => {
+  const onDone = useCallback(async (createdPlaceData) => {
+    // Rafraîchir la liste des établissements
     await onFetchPlaces();
+    
+    // Si un nouvel établissement a été créé, le sélectionner automatiquement
+    if (createdPlaceData && createdPlaceData.id) {
+      // Attendre que la liste soit mise à jour avant de sélectionner
+      setTimeout(() => {
+        setSelectedPlaceId(createdPlaceData.id);
+        localStorage.setItem('selectedPlaceId', createdPlaceData.id.toString());
+      }, 200);
+    }
+    
     // Les stats seront rafraîchies automatiquement via le useEffect qui dépend de places
-    onHide();
-  }, [onFetchPlaces, onHide]);
+    // Le modal sera fermé automatiquement par PlaceFormModal après un court délai
+  }, [onFetchPlaces]);
 
   // Gestion de la suppression
   const handleDeleteClick = useCallback((place) => {
@@ -312,7 +323,7 @@ const Places = () => {
   // Écouter les événements de modification depuis Place.js pour synchroniser les stats
   useEffect(() => {
     const handlePlaceStatsUpdate = (event) => {
-      const { placeId, stats, eventType } = event.detail || {};
+      const { placeId, stats } = event.detail || {};
       
       // Si les stats sont directement fournies dans l'événement, les utiliser
       // Sinon, rafraîchir depuis le backend
@@ -871,6 +882,8 @@ const Places = () => {
                           src={illustrationRestaurant} 
                           alt="Illustration restaurant - Menu digital avec QR code" 
                           className="w-full h-auto object-cover object-center rounded-xl transition-transform duration-300 hover:scale-105"
+                          loading="lazy"
+                          decoding="async"
                           style={{
                             aspectRatio: '16/9',
                             minHeight: '200px',

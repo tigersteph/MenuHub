@@ -85,12 +85,12 @@ body {
 }
 
 .btn-standard {
-  background-color: #ff3366;
+  background-color: #f7651d;
   color: white;
 }
 
 .btn-standard:hover {
-  background-color: #fc285d;
+  background-color: #e55a0f;
   color: white;
 }
 
