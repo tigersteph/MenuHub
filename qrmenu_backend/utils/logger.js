@@ -26,41 +26,57 @@ const consoleFormat = winston.format.combine(
   })
 );
 
-// Création du logger
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: logFormat,
-  defaultMeta: { service: 'qrmenu-backend' },
-  transports: [
-    // Fichier pour les erreurs
+// En production (Northflank, Koyeb, Fly.io, etc.), le filesystem est généralement
+// read-only ou éphémère. On désactive donc les transports File pour éviter
+// les crashes silencieux lors des écritures asynchrones.
+const isProduction = process.env.NODE_ENV === 'production';
+
+const transports = [];
+const exceptionHandlers = [];
+const rejectionHandlers = [];
+
+if (!isProduction) {
+  transports.push(
     new winston.transports.File({
       filename: path.join(__dirname, '../logs/error.log'),
       level: 'error',
       maxsize: 5242880, // 5MB
       maxFiles: 5
     }),
-    // Fichier pour tous les logs
     new winston.transports.File({
       filename: path.join(__dirname, '../logs/combined.log'),
       maxsize: 5242880, // 5MB
       maxFiles: 5
     })
-  ],
-  exceptionHandlers: [
+  );
+
+  exceptionHandlers.push(
     new winston.transports.File({
       filename: path.join(__dirname, '../logs/exceptions.log')
     })
-  ],
-  rejectionHandlers: [
+  );
+
+  rejectionHandlers.push(
     new winston.transports.File({
       filename: path.join(__dirname, '../logs/rejections.log')
     })
-  ]
+  );
+}
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: logFormat,
+  defaultMeta: { service: 'qrmenu-backend' },
+  transports,
+  exceptionHandlers,
+  rejectionHandlers
 });
 
-// Toujours logger dans la console pour voir les logs dans Render/Vercel
+// Toujours logger dans la console (capturé par Northflank / Render / Vercel / Fly)
 logger.add(new winston.transports.Console({
-  format: consoleFormat
+  format: consoleFormat,
+  handleExceptions: isProduction,
+  handleRejections: isProduction
 }));
 
 // Méthodes helper pour un usage simplifié
