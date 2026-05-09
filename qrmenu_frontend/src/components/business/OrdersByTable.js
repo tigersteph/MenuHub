@@ -1,13 +1,10 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import Order from './Order';
 
 /**
  * Composant pour afficher les commandes groupées par table
  */
 const OrdersByTable = ({ orders, onAccept, onDecline, onReadyForPickup, onServed, onComplete }) => {
-  const { t } = useTranslation();
-
   // Grouper les commandes par table (les commandes sont déjà filtrées dans Orders.js)
   const ordersByTable = React.useMemo(() => {
     const grouped = {};

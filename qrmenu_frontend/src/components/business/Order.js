@@ -13,12 +13,7 @@ const Order = ({ order, onAccept, onDecline, onReadyForPickup, onServed, onCompl
   } else if (order.detail) {
     orderDetails = typeof order.detail === 'string' ? JSON.parse(order.detail) : order.detail;
   }
-  
-  // Format items string
-  const itemsString = orderDetails.length > 0 
-    ? orderDetails.map(item => `${item.quantity}x ${item.name || 'Item'}`).join(', ')
-    : t('orders.noItems', 'Aucun article');
-  
+
   // Calculate time ago
   const getTimeAgo = (dateString) => {
     if (!dateString) return '';

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useHistory, useLocation, Link } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { toast } from '../utils/toast';
 import AuthContext from '../contexts/AuthContext';
 import { Eye, EyeOff, ArrowLeft, Mail, Lock, User, Building } from "lucide-react";
@@ -21,7 +21,6 @@ const Register = () => {
     confirmPassword: "",
   });
   const history = useHistory();
-  const location = useLocation();
   const auth = useContext(AuthContext);
 
   const emailValidation = useEmailValidation(formData.email);
