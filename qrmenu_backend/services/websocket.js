@@ -13,15 +13,21 @@ class WebSocketService {
 
   initialize(server) {
     const { Server } = require('socket.io');
-    const cors = require('cors');
+    const allowedOrigins = [
+      process.env.FRONTEND_URL,
+      'https://menu-hub-ten.vercel.app',
+      'http://localhost:3000'
+    ].filter(Boolean);
     
     this.io = new Server(server, {
       cors: {
-        origin: process.env.CORS_ORIGIN || process.env.FRONTEND_URL || '*',
+        origin: allowedOrigins,
         methods: ['GET', 'POST'],
         credentials: true
       },
-      transports: ['websocket', 'polling']
+      transports: ['polling', 'websocket'],
+      pingTimeout: 60000,
+      upgradeTimeout: 30000
     });
 
     this.io.on('connection', (socket) => {

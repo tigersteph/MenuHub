@@ -2,6 +2,8 @@ console.log('DEBUG: app.js is starting...');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 // Import des routes
@@ -12,13 +14,14 @@ const contactRoutes = require('./routes/contact');
 // const orderRoutes = require('./routes/orders');
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3001;
 const placeRoutes = require('./routes/places');
 const menuItemRoutes = require('./routes/menuItems');
 const orderRoutes = require('./routes/orders');
 const tableRoutes = require('./routes/tables');
 const categoryRoutes = require('./routes/categories');
 const uploadRoutes = require('./routes/upload');
+const logger = require('./utils/logger');
 
 // Middleware
 // CORS configuration - à restreindre en production
@@ -28,50 +31,60 @@ const normalizeOrigin = (origin) => {
   return origin.replace(/\/$/, '').toLowerCase();
 };
 
+const configuredFrontend = normalizeOrigin(process.env.FRONTEND_URL);
+const configuredCorsOrigin = normalizeOrigin(process.env.CORS_ORIGIN);
+const allowedOrigins = [
+  configuredFrontend,
+  configuredCorsOrigin,
+  'https://menu-hub-ten.vercel.app',
+  'http://localhost:3000'
+].filter(Boolean);
+
 const corsOptions = {
   origin: (origin, callback) => {
-    // En développement, autoriser toutes les origines
-    if (process.env.NODE_ENV !== 'production') {
-      return callback(null, true);
-    }
-
-    // En production, vérifier l'origine
-    const allowedOrigin = normalizeOrigin(process.env.CORS_ORIGIN || process.env.FRONTEND_URL);
-
-    // Si pas d'origine configurée, refuser
-    if (!allowedOrigin) {
-      return callback(new Error('CORS_ORIGIN not configured'));
-    }
-
-    // Si pas d'origine dans la requête (same-origin ou requête directe), autoriser
-    // Cela peut arriver pour les requêtes preflight ou same-origin
+    // Autoriser les requêtes serveur-à-serveur / health checks sans Origin
     if (!origin) {
-      // Autoriser les requêtes sans origin (same-origin)
       return callback(null, true);
     }
 
     const requestOrigin = normalizeOrigin(origin);
 
-    // Comparer les origines normalisées
-    if (requestOrigin === allowedOrigin) {
+    if (allowedOrigins.includes(requestOrigin)) {
       callback(null, true);
     } else {
-      // Logger pour debug
       console.log('CORS blocked:', {
         requestOrigin,
-        allowedOrigin,
+        allowedOrigins,
         rawRequestOrigin: origin,
-        rawAllowedOrigin: process.env.CORS_ORIGIN || process.env.FRONTEND_URL
+        rawAllowedOrigins: {
+          FRONTEND_URL: process.env.FRONTEND_URL,
+          CORS_ORIGIN: process.env.CORS_ORIGIN
+        }
       });
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   optionsSuccessStatus: 200
-};
+}; 
+app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+const authApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || '5', 10),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'AUTH_RATE_LIMIT',
+      message: 'Trop de tentatives. Veuillez réessayer plus tard.'
+    }
+  }
+});
 
 // Compression HTTP pour réduire la taille des réponses
 const compression = require('compression');
@@ -97,7 +110,7 @@ if (process.env.NODE_ENV === 'production') {
 // const { transformRequestBody } = require('./middlewares/dataTransform');
 // app.use(transformRequestBody);
 // Routes d'authentification (publiques) - DOIT être en premier
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authApiLimiter, authRoutes);
 // Route de contact (publique)
 app.use('/api/contact', contactRoutes);
 
@@ -113,7 +126,15 @@ app.use('/api', orderRoutes);
 // app.use('/api/menu', menuRoutes);
 // app.use('/api/orders', orderRoutes);
 
-// Route de test
+// Health check Koyeb (sans auth)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Route legacy conservée pour compatibilité
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
@@ -126,7 +147,6 @@ app.get('/api/health', (req, res) => {
 if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
   try {
     const { swaggerUi, specs } = require('./swagger');
-    const logger = require('./utils/logger');
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
       customCss: '.swagger-ui .topbar { display: none }',
       customSiteTitle: 'MenuHub API Documentation'
@@ -172,8 +192,7 @@ emailService.initialize().catch(err => {
 
 // Démarrer le serveur
 console.log('DEBUG: about to call app.listen on port', PORT);
-const server = app.listen(PORT, async () => {
-  const logger = require('./utils/logger');
+const server = app.listen(PORT, '0.0.0.0', async () => {
   logger.info('Server started', { port: PORT, environment: process.env.NODE_ENV || 'development' });
   console.log(`🚀 Serveur démarré sur le port ${PORT}`);
   console.log(`🌍 Environnement: ${process.env.NODE_ENV || 'development'}`);
@@ -187,15 +206,38 @@ const server = app.listen(PORT, async () => {
   }
 });
 
-// Nettoyer à l'arrêt
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  await cacheService.disconnect();
-  server.close(() => {
-    logger.info('Server closed');
-    process.exit(0);
-  });
-});
+const db = require('./config/db');
+let shuttingDown = false;
+
+const gracefulShutdown = async (signal) => {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  logger.info(`${signal} received, shutting down gracefully`);
+
+  const forceCloseTimer = setTimeout(() => {
+    logger.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 10000);
+
+  try {
+    await cacheService.disconnect();
+    await db.pool.end();
+    logger.info('Database pool closed');
+
+    server.close(() => {
+      clearTimeout(forceCloseTimer);
+      logger.info('Server closed');
+      process.exit(0);
+    });
+  } catch (err) {
+    clearTimeout(forceCloseTimer);
+    logger.error('Graceful shutdown failed', { error: err.message });
+    process.exit(1);
+  }
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Gestion des erreurs non capturées
 process.on('unhandledRejection', (err) => {
