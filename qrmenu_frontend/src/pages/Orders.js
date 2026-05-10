@@ -49,14 +49,17 @@ const Orders = () => {
     try {
       const json = await fetchOrders(params.id, auth.token);
       
-      // Le backend peut retourner { success: true, data: [...] } ou directement un array
+      // Le backend peut retourner :
+      //  - directement un array
+      //  - { success: true, data: [...] }
+      //  - { success: true, data: { orders: [...], pagination: {...} } } (format paginé actuel)
       let ordersArray = null;
       if (json && Array.isArray(json)) {
         ordersArray = json;
       } else if (json && json.data && Array.isArray(json.data)) {
         ordersArray = json.data;
-      } else if (json && json.success && json.data && Array.isArray(json.data)) {
-        ordersArray = json.data;
+      } else if (json && json.data && Array.isArray(json.data.orders)) {
+        ordersArray = json.data.orders;
       }
       
       if (ordersArray !== null) {
