@@ -64,6 +64,24 @@ class WebSocketService {
         logger.info('Client left place room', { socketId: socket.id, placeId });
       });
 
+      // Rejoindre une room ciblée pour le suivi temps réel d'une commande spécifique
+      // (utilisé par le client final côté téléphone)
+      socket.on('join-order', (orderId) => {
+        if (!orderId) {
+          socket.emit('error', { message: 'Order ID requis' });
+          return;
+        }
+        socket.join(`order:${orderId}`);
+        logger.info('Client joined order room', { socketId: socket.id, orderId });
+        socket.emit('order-joined', { orderId });
+      });
+
+      // Quitter la room d'une commande
+      socket.on('leave-order', (orderId) => {
+        socket.leave(`order:${orderId}`);
+        logger.info('Client left order room', { socketId: socket.id, orderId });
+      });
+
       socket.on('disconnect', () => {
         logger.info('WebSocket client disconnected', { socketId: socket.id });
         // Nettoyer les références
@@ -108,7 +126,9 @@ class WebSocketService {
   }
 
   /**
-   * Notifier tous les clients d'un établissement d'un changement de statut
+   * Notifier le changement de statut :
+   *  - aux gérants connectés à `place:${placeId}` (dashboard business)
+   *  - au client final connecté à `order:${orderId}` (téléphone)
    */
   notifyOrderStatusChange(placeId, orderId, oldStatus, newStatus) {
     if (!this.io) {
@@ -116,12 +136,15 @@ class WebSocketService {
       return;
     }
 
-    this.io.to(`place:${placeId}`).emit('order-status-changed', {
+    const payload = {
       type: 'order-status-changed',
       orderId,
       oldStatus,
       newStatus
-    });
+    };
+
+    this.io.to(`place:${placeId}`).emit('order-status-changed', payload);
+    this.io.to(`order:${orderId}`).emit('order-status-changed', payload);
 
     logger.orderStatusChanged(orderId, oldStatus, newStatus);
     logger.info('Order status change notification sent', { placeId, orderId, newStatus });

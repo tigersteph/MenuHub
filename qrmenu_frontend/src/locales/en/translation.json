@@ -236,5 +236,17 @@
   "menu.orderConfirmation.cancelOrder": "Cancel Order",
   "menu.orderConfirmation.cancelConfirm": "Are you sure you want to cancel this order?",
   "menu.orderConfirmation.cancelSuccess": "Order cancelled successfully",
-  "menu.orderConfirmation.cancelError": "Error cancelling order"
+  "menu.orderConfirmation.cancelError": "Error cancelling order",
+  "menu.orderConfirmation.statusLabel": "Order status",
+  "menu.orderConfirmation.statusChangedToast": "Status updated: {{status}}",
+  "menu.orderConfirmation.live": "Live",
+  "menu.orderConfirmation.offline": "Offline",
+  "menu.orderConfirmation.liveOn": "Real-time connection active",
+  "menu.orderConfirmation.liveOff": "Real-time connection unavailable",
+  "menu.orderConfirmation.status.pending": "Pending",
+  "menu.orderConfirmation.status.processing": "Being prepared",
+  "menu.orderConfirmation.status.ready": "Ready to serve",
+  "menu.orderConfirmation.status.served": "Served",
+  "menu.orderConfirmation.status.completed": "Completed",
+  "menu.orderConfirmation.status.cancelled": "Cancelled"
 }

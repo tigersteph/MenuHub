@@ -36,7 +36,10 @@ const PaymentForm = ({ amount, items, onDone, color, placeId, tableId }) => {
       const result = await createOrder(placeId, tableId, items);
       
       if (result?.success) {
-        toast.success(t('menu.order.success', { orderNumber: result.order?.id || 'N/A' }), {
+        // Le backend renvoie { success, data: { id, ... }, message }.
+        // On supporte aussi un éventuel ancien format { success, order: {...} }.
+        const order = result.data || result.order || null;
+        toast.success(t('menu.order.success', { orderNumber: order?.id || 'N/A' }), {
           type: "success",
           position: "bottom-center",
           // Using default duration (3500ms for success notifications)
@@ -44,7 +47,7 @@ const PaymentForm = ({ amount, items, onDone, color, placeId, tableId }) => {
         // Passer les données de la commande à onDone
         // Note: onDone peut déclencher une navigation/fermeture du composant
         onDone({
-          order: result.order,
+          order,
           totalAmount: amount
         });
       } else {

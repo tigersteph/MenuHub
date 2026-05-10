@@ -236,5 +236,17 @@
   "menu.orderConfirmation.cancelOrder": "Annuler la commande",
   "menu.orderConfirmation.cancelConfirm": "Êtes-vous sûr de vouloir annuler cette commande ?",
   "menu.orderConfirmation.cancelSuccess": "Commande annulée avec succès",
-  "menu.orderConfirmation.cancelError": "Erreur lors de l'annulation de la commande"
+  "menu.orderConfirmation.cancelError": "Erreur lors de l'annulation de la commande",
+  "menu.orderConfirmation.statusLabel": "Statut de la commande",
+  "menu.orderConfirmation.statusChangedToast": "Statut mis à jour : {{status}}",
+  "menu.orderConfirmation.live": "En direct",
+  "menu.orderConfirmation.offline": "Hors ligne",
+  "menu.orderConfirmation.liveOn": "Connexion temps réel active",
+  "menu.orderConfirmation.liveOff": "Connexion temps réel indisponible",
+  "menu.orderConfirmation.status.pending": "En attente",
+  "menu.orderConfirmation.status.processing": "En préparation",
+  "menu.orderConfirmation.status.ready": "Prête à être servie",
+  "menu.orderConfirmation.status.served": "Servie",
+  "menu.orderConfirmation.status.completed": "Terminée",
+  "menu.orderConfirmation.status.cancelled": "Annulée"
 }
