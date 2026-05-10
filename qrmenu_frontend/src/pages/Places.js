@@ -136,11 +136,11 @@ const Places = () => {
           console.log('Structure des données place:', placesArray[0]);
         }
         // Si l'URL contient un ID d'établissement, l'utiliser comme sélectionné
-        const pathMatch = location.pathname.match(/\/places\/(\d+)/);
+        const pathMatch = location.pathname.match(/\/places\/([^/?#]+)/);
         if (pathMatch && pathMatch[1]) {
-          const placeIdFromUrl = parseInt(pathMatch[1]);
-          if (placesArray.find(p => p.id === placeIdFromUrl)) {
-            setSelectedPlaceId(placeIdFromUrl);
+          const matchedFromUrl = placesArray.find(p => String(p.id) === pathMatch[1]);
+          if (matchedFromUrl) {
+            setSelectedPlaceId(matchedFromUrl.id);
             return;
           }
         }
@@ -148,8 +148,11 @@ const Places = () => {
         if (placesArray.length > 0 && !selectedPlaceId) {
           // Vérifier localStorage d'abord
           const savedPlaceId = localStorage.getItem('selectedPlaceId');
-          if (savedPlaceId && placesArray.find(p => p.id === parseInt(savedPlaceId))) {
-            setSelectedPlaceId(parseInt(savedPlaceId));
+          const matchedSaved = savedPlaceId
+            ? placesArray.find(p => String(p.id) === savedPlaceId)
+            : null;
+          if (matchedSaved) {
+            setSelectedPlaceId(matchedSaved.id);
           } else {
             setSelectedPlaceId(placesArray[0].id);
             localStorage.setItem('selectedPlaceId', placesArray[0].id.toString());
@@ -395,8 +398,8 @@ const Places = () => {
     }
     
     // Extraire l'ID de l'établissement depuis l'URL actuelle
-    const pathMatch = currentPath.match(/\/places\/(\d+)/);
-    const currentPlaceId = pathMatch ? parseInt(pathMatch[1]) : null;
+    const pathMatch = currentPath.match(/\/places\/([^/?#]+)/);
+    const currentPlaceId = pathMatch ? pathMatch[1] : null;
     const activePlaceId = selectedPlaceId || currentPlaceId || (places.length > 0 ? places[0].id : null);
     
     if (activePlaceId) {

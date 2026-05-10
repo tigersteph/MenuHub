@@ -17,13 +17,14 @@ const EditPlace = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const json = await fetchPlace(params.id, auth.token);
-      if (json) {
-        setPlace(json);
-        setName(json.name || '');
-        setAddress(json.address || '');
-        setPhone(json.phone || '');
-        setLogo(json.logoUrl || json.logo_url || '');
+      const response = await fetchPlace(params.id, auth.token);
+      const placeData = response?.data || response;
+      if (placeData && placeData.id) {
+        setPlace(placeData);
+        setName(placeData.name || '');
+        setAddress(placeData.address || '');
+        setPhone(placeData.phone || '');
+        setLogo(placeData.logoUrl || placeData.logo_url || '');
       }
     };
     fetch();
@@ -41,10 +42,10 @@ const EditPlace = () => {
   const onSave = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const json = await updatePlace(place.id, { name, address, phone, logoUrl: logo, logo_url: logo }, auth.token);
+    const json = await updatePlace(params.id, { name, address, phone, logoUrl: logo, logo_url: logo }, auth.token);
     setLoading(false);
     if (json) {
-      history.push(`/places/${place.id}`);
+      history.push(`/places/${params.id}`);
     }
   };
 
@@ -54,7 +55,7 @@ const EditPlace = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
           <div className="flex items-center gap-3 sm:gap-4">
             <BackButton 
-              onClick={() => history.push(`/places/${place.id}`)} 
+              onClick={() => history.push(`/places/${params.id}`)} 
               ariaLabel="Retour à la gestion de l'établissement" 
             />
             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-dark-text truncate flex-1">
@@ -108,7 +109,7 @@ const EditPlace = () => {
             <button 
               type="button" 
               className="w-full sm:w-auto bg-white border-2 border-gray-border text-gray-700 font-semibold py-2.5 sm:py-2 px-6 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 min-h-[44px] text-sm sm:text-base" 
-              onClick={() => history.push(`/places/${place.id}`)}
+              onClick={() => history.push(`/places/${params.id}`)}
             >
               Annuler
             </button>
